@@ -2,6 +2,12 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'motion/react'
 import ModelViewer from './ModelViewer'
 
+const fade = (delay = 0, y = 24) => ({
+  initial: { opacity: 0, y },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.9, delay, ease: [0.16, 1, 0.3, 1] },
+})
+
 const ParticleField = () => {
   const canvasRef = useRef(null)
 
@@ -9,16 +15,16 @@ const ParticleField = () => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight }
+    resize()
 
-    const particles = Array.from({ length: 60 }, () => ({
+    const particles = Array.from({ length: 80 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      size: Math.random() * 2 + 0.5,
-      speedX: (Math.random() - 0.5) * 0.4,
-      speedY: -Math.random() * 0.6 - 0.2,
-      opacity: Math.random() * 0.5 + 0.1,
+      size: Math.random() * 1.8 + 0.3,
+      speedX: (Math.random() - 0.5) * 0.3,
+      speedY: -Math.random() * 0.5 - 0.15,
+      opacity: Math.random() * 0.4 + 0.05,
     }))
 
     let animId
@@ -29,7 +35,7 @@ const ParticleField = () => {
         ctx.globalAlpha = p.opacity
         ctx.fillStyle = '#7ec870'
         ctx.shadowColor = '#7ec870'
-        ctx.shadowBlur = 6
+        ctx.shadowBlur = 8
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
         ctx.fill()
@@ -41,13 +47,8 @@ const ParticleField = () => {
       animId = requestAnimationFrame(draw)
     }
     draw()
-
-    const onResize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-    window.addEventListener('resize', onResize)
-    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', onResize) }
+    window.addEventListener('resize', resize)
+    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize) }
   }, [])
 
   return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-10" />
@@ -55,101 +56,80 @@ const ParticleField = () => {
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-[#0a0a08]">
-      {/* Background layers */}
+    <section className="relative min-h-screen w-full flex items-center overflow-hidden bg-[#0a0a08]">
+      {/* Background */}
       <div className="absolute inset-0 z-0">
-        {/* Radial glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_60%_50%,_#1a3a1a_0%,_transparent_60%)]" />
-        {/* Grid lines */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_65%_50%,_#1c3d1a_0%,_transparent_65%)]" />
         <div
-          className="absolute inset-0 opacity-5"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage: `linear-gradient(#7ec870 1px, transparent 1px), linear-gradient(90deg, #7ec870 1px, transparent 1px)`,
-            backgroundSize: '80px 80px',
+            backgroundSize: '100px 100px',
           }}
         />
-        {/* Vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_40%,_#0a0a08_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_#0a0a08_90%)]" />
       </div>
 
       <ParticleField />
 
-      <div className="relative z-20 max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pt-24">
-        {/* Left: Text */}
+      <div className="relative z-20 w-full max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center pt-28 pb-20">
+        {/* Left */}
         <div>
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex items-center gap-3 mb-8"
-          >
-            <div className="w-8 h-px bg-[#4a7c3f]" />
-            <span className="text-[#4a7c3f] text-xs tracking-[0.5em] uppercase" style={{ fontFamily: "'Cinzel', serif" }}>
+          <motion.div {...fade(0.2, 0)} className="flex items-center gap-3 mb-10">
+            <div className="w-10 h-px bg-[#4a7c3f]" />
+            <span className="text-[#4a7c3f] text-[10px] tracking-[0.6em] uppercase" style={{ fontFamily: "'Cinzel', serif" }}>
               Konohagakure no Sato
             </span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="text-white leading-[0.9] mb-6"
-            style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: 'clamp(3rem, 8vw, 7rem)', fontWeight: 700 }}
+            {...fade(0.35, 50)}
+            className="text-white leading-[0.88] mb-8"
+            style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: 'clamp(3.5rem, 9vw, 8rem)', fontWeight: 700 }}
           >
             Hidden
             <span className="block text-[#7ec870]">Leaf</span>
-            <span className="block text-[#a89f7e]" style={{ fontSize: '0.55em' }}>Village</span>
+            <span className="block text-[#a89f7e]" style={{ fontSize: '0.5em', letterSpacing: '0.15em' }}>Village</span>
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.6 }}
-            className="text-[#6b6451] max-w-md leading-relaxed mb-10 text-sm tracking-wide"
-          >
+          <motion.p {...fade(0.6)} className="text-[#8a8a7a] max-w-lg leading-relaxed py-10 text-sm tracking-wide">
             Located in the Land of Fire, Konohagakure stands as the most powerful of the
             Five Great Shinobi Nations — forged in will, blood, and an unbreakable bond
             between its people.
           </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.75 }}
-            className="flex flex-wrap gap-4"
-          >
+          <motion.div {...fade(0.75)} className="flex flex-wrap gap-4">
             <a
               href="#about"
-              className="group relative px-8 py-3.5 bg-[#4a7c3f] text-white text-xs tracking-widest uppercase overflow-hidden"
+              className="group relative px-10 py-4 bg-[#4a7c3f] text-white text-[10px] tracking-[0.3em] uppercase overflow-hidden"
               style={{ fontFamily: "'Cinzel', serif" }}
             >
               <span className="relative z-10">Explore Village</span>
-              <span className="absolute inset-0 bg-[#7ec870] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-400" />
+              <span className="absolute inset-0 bg-[#7ec870] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500" />
             </a>
             <a
               href="#arsenal"
-              className="px-8 py-3.5 border border-[#2a2a20] text-[#6b6451] text-xs tracking-widest uppercase hover:border-[#4a7c3f] hover:text-[#7ec870] transition-all duration-300"
+              className="px-10 py-4 border border-[#2a2a22] text-[#7a7a6a] text-[10px] tracking-[0.3em] uppercase hover:border-[#4a7c3f] hover:text-[#7ec870] transition-all duration-400"
               style={{ fontFamily: "'Cinzel', serif" }}
             >
               View Arsenal
             </a>
           </motion.div>
 
-          {/* Stats */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.1 }}
-            className="flex gap-10 mt-16 pt-8 border-t border-[#1a1a14]"
+            transition={{ delay: 1.1, duration: 0.8 }}
+            className="flex gap-12 mt-20 pt-8 border-t border-[#161610]"
           >
             {[
               { value: '7', label: 'Hokage' },
               { value: '12', label: 'Clans' },
               { value: '∞', label: 'Will of Fire' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <p className="text-[#7ec870] text-2xl font-bold" style={{ fontFamily: "'Cinzel', serif" }}>{stat.value}</p>
-                <p className="text-[#3a3a2a] text-[10px] tracking-widest uppercase mt-0.5">{stat.label}</p>
+            ].map((s) => (
+              <div key={s.label}>
+                <p className="text-[#7ec870] text-3xl font-bold" style={{ fontFamily: "'Cinzel', serif" }}>{s.value}</p>
+                <p className="text-[#5a5a4a] text-[9px] tracking-[0.4em] uppercase mt-1">{s.label}</p>
               </div>
             ))}
           </motion.div>
@@ -157,20 +137,20 @@ export default function Hero() {
 
         {/* Right: 3D Model */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="relative"
+          transition={{ duration: 1.4, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="relative flex items-center justify-center"
         >
-          {/* Glow ring behind model */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-72 h-72 rounded-full bg-[#4a7c3f]/10 blur-3xl" />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-48 h-48 rounded-full border border-[#4a7c3f]/20 animate-ping" style={{ animationDuration: '3s' }} />
-          </div>
+          <div className="absolute w-[500px] h-[500px] rounded-full bg-[#4a7c3f]/8 blur-[80px] pointer-events-none" />
+          <div className="absolute w-[320px] h-[320px] rounded-full border border-[#4a7c3f]/15 animate-ping pointer-events-none" style={{ animationDuration: '4s' }} />
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 40, ease: 'linear' }}
+            className="absolute w-[420px] h-[420px] rounded-full border border-dashed border-[#4a7c3f]/10 pointer-events-none"
+          />
 
-          <div className="relative h-[500px] lg:h-[600px]">
+          <div className="relative w-full h-[520px] lg:h-[640px]">
             <ModelViewer
               modelPath="/src/assets/3d/naruto_headband.glb"
               autoRotate
@@ -180,13 +160,12 @@ export default function Hero() {
             />
           </div>
 
-          {/* Floating label */}
           <motion.div
-            animate={{ y: [0, -8, 0] }}
+            animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-[#0f0f0a]/80 border border-[#4a7c3f]/30 backdrop-blur-sm px-5 py-2 text-center"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#0d0d0a]/80 border border-[#4a7c3f]/25 backdrop-blur-sm px-6 py-2.5"
           >
-            <p className="text-[#7ec870] text-[10px] tracking-[0.4em] uppercase" style={{ fontFamily: "'Cinzel', serif" }}>
+            <p className="text-[#7ec870] text-[9px] tracking-[0.5em] uppercase" style={{ fontFamily: "'Cinzel', serif" }}>
               Konoha Headband
             </p>
           </motion.div>
@@ -197,14 +176,14 @@ export default function Hero() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+        transition={{ delay: 1.6 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
       >
-        <span className="text-[#3a3a2a] text-[9px] tracking-[0.5em] uppercase">Scroll</span>
+        <span className="text-[#5a5a4a] text-[9px] tracking-[0.6em] uppercase">Scroll</span>
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-          className="w-px h-8 bg-gradient-to-b from-[#4a7c3f] to-transparent"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 1.6 }}
+          className="w-px h-10 bg-gradient-to-b from-[#4a7c3f] to-transparent"
         />
       </motion.div>
     </section>
