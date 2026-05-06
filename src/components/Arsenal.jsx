@@ -5,7 +5,7 @@ import ModelViewer from './ModelViewer'
 const items = [
   {
     id: 'shuriken',
-    model: '/src/assets/3d/shuriken.glb',
+    model: '/models/shuriken.glb',
     name: 'Shuriken',
     kanji: '手裏剣',
     type: 'Throwing Weapon',
@@ -20,7 +20,7 @@ const items = [
   },
   {
     id: 'scrolls',
-    model: '/src/assets/3d/scrolls_from_naruto.glb',
+    model: '/models/scrolls_from_naruto.glb',
     name: 'Ninja Scrolls',
     kanji: '忍巻物',
     type: 'Summoning / Storage',

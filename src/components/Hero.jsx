@@ -152,7 +152,7 @@ export default function Hero() {
 
           <div className="relative w-full h-[520px] lg:h-[640px]">
             <ModelViewer
-              modelPath="/src/assets/3d/naruto_headband.glb"
+              modelPath="/models/naruto_headband.glb"
               autoRotate
               cameraZ={3.5}
               lightColor="#7ec870"
